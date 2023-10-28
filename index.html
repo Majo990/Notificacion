@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notificaciones Web Push</title>
+    <script src="service-worker.js"></script>
+</head>
+<body>
+    <h1>Configuración de Notificaciones Web Push</h1>
+    <button id="habilitar-notificaciones">Habilitar Notificaciones</button>
+
+    <script>
+        let registration; // Declarar la variable registration en un ámbito global
+        const applicationServerKey = 'BKK8KhlFwXk8X2VJMQ2Dy2_fR7cTTfDOpXKmZzk2hKgacuYEoNxJGd_BxFdzYaAq29_irJAOU9NzAqiVZ2Zkv1g'; // Mover la clave a un ámbito global
+
+        if ('Notification' in window && 'serviceWorker' in navigator) {
+            // Registramos un Service Worker
+            navigator.serviceWorker.register('service-worker.js').then(function(reg) {
+                registration = reg;
+                console.log('Service Worker registrado con éxito:', registration);
+            }).catch(function(error) {
+                console.error('Error al registrar Service Worker:', error);
+            });
+
+            document.getElementById("habilitar-notificaciones").onclick = function () {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === "granted") {
+                        // Suscribir al usuario al servicio de notificaciones
+                        registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: applicationServerKey }).then(function(subscription) {
+                            console.log('Suscripción exitosa:', subscription);
+
+                            // Envía un mensaje de prueba como notificación
+                            registration.showNotification('Notificación de prueba', { body: 'Este es un mensaje de prueba' });
+                            console.log('Notificación de prueba enviada.');
+                        }).catch(function(error) {
+                            console.error('Error al suscribirse:', error);
+                        });
+                    }
+                });
+            };
+        }
+    </script>
+</body>
+</html>
